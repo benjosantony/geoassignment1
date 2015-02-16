@@ -4,20 +4,19 @@
     <meta charset="UTF-8">
     <title>Assignment 1</title>
     <link rel="stylesheet" href="leaflet/leaflet.css"/>
-
-
     <link rel="stylesheet" href="css/main.css"/>
     <!--Load the jquery-->
-    <script src="js/jquery.min.js"></script>
+
     <style>
         .info {
             padding: 6px 8px;
             font: 14px/16px Arial, Helvetica, sans-serif;
             background: white;
-            background: rgba(255,255,255,0.8);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
         }
+
         .info h4 {
             margin: 0 0 5px;
             color: #777;
@@ -26,14 +25,22 @@
 
     <!-- CSS for Plugins-->
     <!--Font awesome-->
-    <link href="plugins/locate/font-awesome.min.css" rel="stylesheet">
+    <link href="plugins/font_awesome/css/font-awesome.css" rel="stylesheet">
     <!--Locate -->
-    <link rel="stylesheet" href="plugins/locate/L.Control.Locate.min.css" />
+    <link rel="stylesheet" href="plugins/locate/L.Control.Locate.min.css"/>
     <!--[if lt IE 9]>
     <link rel="stylesheet" href="plugins/locate/L.Control.Locate.ie.min.css"/>
     <![endif]-->
     <!--Geo Search-->
     <link rel="stylesheet" href="plugins/geosearch/l.geosearch.css"/>
+    <!--Awesome Markers-->
+    <link rel="stylesheet" href="plugins/awesome_markers/leaflet.awesome-markers.css"/>
+    <!--Marker cluster-->
+    <link rel="stylesheet" href="plugins/marker_cluster/MarkerCluster.css"/>
+    <link rel="stylesheet" href="plugins/marker_cluster/MarkerCluster.Default.css"/>
+    <!--Zoom slider-->
+    <link rel="stylesheet" href="plugins/zoom_slider/L.Control.Zoomslider.css"/>
+
 
 </head>
 
@@ -41,20 +48,32 @@
 <div id="map"></div>
 <!--Load Leaflet after defining the  div with id of map-->
 <script src="leaflet/leaflet.js"></script>
+<script src="plugins/jquery.min.js"></script>
+
+
 <!--Load any js files for plugins-->
 <!--Locate-->
-<script src="plugins/locate/L.Control.Locate.min.js" ></script>
-<script src="plugins/geosearch/l.control.geosearch.js" ></script>
-<script src="plugins/geosearch/l.geosearch.provider.openstreetmap.js" ></script>
-
+<script src="plugins/locate/L.Control.Locate.min.js"></script>
+<!--Geo Search-->
+<script src="plugins/geosearch/l.control.geosearch.js"></script>
+<script src="plugins/geosearch/l.geosearch.provider.openstreetmap.js"></script>
+<!--Awesome markers-->
+<script src="plugins/awesome_markers/leaflet.awesome-markers.min.js"></script>
+<!--Marker cluster-->
+<script src="plugins/marker_cluster/leaflet.markercluster.js"></script>
+<!--Zoom Slider-->
+<script src="plugins/zoom_slider/L.Control.Zoomslider.js"></script>
 
 
 <!--Lets load all the data necessary TODO  can consider adding a spinner while the data is loading-->
-<script src='data/bus_routes.js' ></script>
+<script src='data/bus_routes.js'></script>
+<script src='data/bus_stops.js'></script>
 <!--Lets do the scripting-->
 <script>
     // Set the map
-    var map = L.map('map', { zoomControl:true }).fitBounds([[1.0767513637,103.591111131],[1.57579761917,104.103108808]]);
+
+    //var map = L.map('map', { zoomControl:true }).fitBounds([[1.0767513637,103.591111131],[1.57579761917,104.103108808]]);
+    var map = L.map('map', {zoomControl: true,zoomSliderControl:true}).setView([1.355312, 103.840068], 12);
     // group for the  vectors
     var feature_group = new L.featureGroup([]);
 
@@ -62,16 +81,18 @@
     var osmBlackAndWhiteBaseMap = L.tileLayer('http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png');
 
     // Add the base layers to the map
-    osmStandardBaseMap.addTo(map);
+
     osmBlackAndWhiteBaseMap.addTo(map);
+    osmStandardBaseMap.addTo(map);
     // baseMaps key value pair to be added in the layer group
     var baseMaps = {
-        'OSM Standard' : osmStandardBaseMap,
-        'OSM Black & White' : osmBlackAndWhiteBaseMap
+
+        'OSM Black & White': osmBlackAndWhiteBaseMap,
+        'OSM Standard': osmStandardBaseMap
     };
 
     // General Information container control
-    var info = L.control({position:'topright'});
+    var info = L.control({position: 'topright'});
     info.onAdd = function (map) {
         this._div = L.DomUtil.create('div', 'info');
         this.update();
@@ -79,12 +100,11 @@
     };
 
     info.update = function (htmlContent) {
-        this._div.innerHTML = htmlContent ?  htmlContent : '<h4> Information Panel</h4> Hover over  the features to see details' ;
+        this._div.innerHTML = htmlContent ? htmlContent : '<h4> Information Panel</h4> Hover over  the features to see details';
 
     };
 
     info.addTo(map);
-
 
 
     // Lets deal with the basic layers first
@@ -93,12 +113,12 @@
      * Reset the highlight the feature of  busroute
      * @param e
      */
-    function highlightFeatureBusRoute(e){
+    function highlightFeatureBusRoute(e) {
         var layer = e.target;
 
         layer.setStyle({
             weight: 2,
-            color: 'white',
+            color: 'red',
             dashArray: '',
             fillOpacity: 0.7
         });
@@ -107,16 +127,16 @@
             layer.bringToFront();
         }
         info.update('<h4>Bus Routes</h4>' +
-        ' Service Number:' + layer.feature.properties.svc_num+' <br/>' +
+        ' Service Number:' + layer.feature.properties.svc_num + ' <br/>' +
         ' Service Direction: ' + layer.feature.properties.svc_dir);
     }
 
-    var busRoutesGeoJson ;
+    var busRoutesGeoJson;
     /**
      * Reset the style of the BusRoute
      * @param e
      */
-    function resetHighlightBusRoute(e){
+    function resetHighlightBusRoute(e) {
         busRoutesGeoJson.resetStyle(e.target);
         info.update();
     }
@@ -124,14 +144,17 @@
     function onEachFeatureBusRoute(feature, layer) {
         layer.on({
             mouseover: highlightFeatureBusRoute,
-            mouseout: resetHighlightBusRoute
-            //click: zoomToFeature
+            mouseout: resetHighlightBusRoute,
+            click: zoomToFeature
         });
     }
+    function zoomToFeature(e) {
+        map.fitBounds(e.target.getBounds());
+    }
     // Define the bus route layer
-    busRoutesGeoJson  = L.geoJson(busRouteData,{
-        style:styleBusRoute,
-        onEachFeature:onEachFeatureBusRoute
+    busRoutesGeoJson = L.geoJson(busRouteData, {
+        style: styleBusRoute,
+        onEachFeature: onEachFeatureBusRoute
     });
 
 
@@ -140,13 +163,51 @@
     function styleBusRoute(feature) {
         return {
             opacity: 1,
-            weight:1,
+            weight: 1,
             color: '#666'
         };
     }
 
-    // Add the layer controls
-    L.control.layers(baseMaps,{'Bus Routes': busRoutesGeoJson},{collapsed:true}).addTo(map);
+
+    // Lets deal with the  bus stops layer , with custom icons and stuff
+
+    var markers = L.markerClusterGroup(
+            {
+                maxClusterRadius: 100
+            }
+    );
+
+
+    var busStopsGeoJson =
+    L.geoJson(busStopsData, {
+        pointToLayer: function (feature, latlng) {
+            return L.marker(latlng, {
+                icon: L.AwesomeMarkers.icon({
+                    icon: "bus",
+                    prefix: 'fa',
+                    iconColor: 'white',
+
+                    markerColor: 'red'
+                })
+            });
+        },
+        onEachFeature: function (feature, layer) {
+            var popupContent = '<table>' +
+
+                    '<tr><th scope="row">Bus Stop Number</th><td>'
+                    + feature.properties['BUS_STOP_N']
+                    + '</td></tr><tr><th scope="row">Bus Roof Number</th><td>'
+                    + feature.properties['BUS_ROOF_N']
+                    + '</td></tr><tr><th scope="row">Location</th><td>'
+                    + feature.properties['LOC_DESC']
+                    + '</td></tr>' +
+                    '</table>';
+            layer.bindPopup(popupContent);
+        }
+    });
+
+    markers.addLayer(busStopsGeoJson);
+    markers.addTo(map);
 
 
 
@@ -166,8 +227,10 @@
         followMarkerStyle: {},
         circlePadding: [0, 0], // padding around accuracy circle, value is passed to setBounds
         metric: true,  // use metric or imperial units
-        onLocationError: function(err) {alert(err.message)},  // define an error callback function
-        onLocationOutsideMapBounds:  function(context) { // called when outside map boundaries
+        onLocationError: function (err) {
+            alert(err.message)
+        },  // define an error callback function
+        onLocationOutsideMapBounds: function (context) { // called when outside map boundaries
             alert(context.options.strings.outsideMapBoundsMsg);
         },
         strings: {
@@ -178,6 +241,13 @@
         locateOptions: {}  // define location options e.g enableHighAccuracy: true
     }).addTo(map);
 
+
+    // Add the layer controls
+    L.control.layers(baseMaps,
+            {
+                'Bus Routes': busRoutesGeoJson,
+                'Bus Stops': markers
+            }, {collapsed: false, position: 'topleft'}).addTo(map);
 
 
     new L.Control.GeoSearch({
