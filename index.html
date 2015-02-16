@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <title>Assignment 1</title>
     <link rel="stylesheet" href="leaflet/leaflet.css"/>
-    <link rel="stylesheet" href="css/1.css"/>
+
+
+    <link rel="stylesheet" href="css/main.css"/>
     <!--Load the jquery-->
     <script src="js/jquery.min.js"></script>
     <style>
@@ -21,12 +23,31 @@
             color: #777;
         }
     </style>
+
+    <!-- CSS for Plugins-->
+    <!--Font awesome-->
+    <link href="plugins/locate/font-awesome.min.css" rel="stylesheet">
+    <!--Locate -->
+    <link rel="stylesheet" href="plugins/locate/L.Control.Locate.min.css" />
+    <!--[if lt IE 9]>
+    <link rel="stylesheet" href="plugins/locate/L.Control.Locate.ie.min.css"/>
+    <![endif]-->
+    <!--Geo Search-->
+    <link rel="stylesheet" href="plugins/geosearch/l.geosearch.css"/>
+
 </head>
 
 <body>
 <div id="map"></div>
 <!--Load Leaflet after defining the  div with id of map-->
 <script src="leaflet/leaflet.js"></script>
+<!--Load any js files for plugins-->
+<!--Locate-->
+<script src="plugins/locate/L.Control.Locate.min.js" ></script>
+<script src="plugins/geosearch/l.control.geosearch.js" ></script>
+<script src="plugins/geosearch/l.geosearch.provider.openstreetmap.js" ></script>
+
+
 
 <!--Lets load all the data necessary TODO  can consider adding a spinner while the data is loading-->
 <script src='data/bus_routes.js' ></script>
@@ -50,7 +71,7 @@
     };
 
     // General Information container control
-    var info = L.control();
+    var info = L.control({position:'topright'});
     info.onAdd = function (map) {
         this._div = L.DomUtil.create('div', 'info');
         this.update();
@@ -58,8 +79,8 @@
     };
 
     info.update = function (htmlContent) {
-        this._div.innerHTML = htmlContent ?  htmlContent : '<h4> Connectivity Analysis </h4>' +
-        ' Hover over the features to see details';
+        this._div.innerHTML = htmlContent ?  htmlContent : '<h4> Information Panel</h4> Hover over  the features to see details' ;
+
     };
 
     info.addTo(map);
@@ -112,6 +133,8 @@
         style:styleBusRoute,
         onEachFeature:onEachFeatureBusRoute
     });
+
+
     busRoutesGeoJson.addTo(map);
 
     function styleBusRoute(feature) {
@@ -121,13 +144,47 @@
             color: '#666'
         };
     }
-    // Pop up function for the bus route
-    function popUpBusRoute(feature, layer){
 
-    }
-
+    // Add the layer controls
+    L.control.layers(baseMaps,{'Bus Routes': busRoutesGeoJson},{collapsed:true}).addTo(map);
 
 
+
+
+    // Additional Plugins
+
+    // domoritz/leaflet-locatecontrol
+    L.control.locate({
+        position: 'topleft',  // set the location of the control
+        drawCircle: true,  // controls whether a circle is drawn that shows the uncertainty about the location
+        follow: false,  // follow the user's location
+        setView: true, // automatically sets the map view to the user's location, enabled if `follow` is true
+        stopFollowingOnDrag: false, // stop following when the map is dragged if `follow` is true (deprecated, see below)
+        circleStyle: {},  // change the style of the circle around the user's location
+        markerStyle: {},
+        followCircleStyle: {},  // set difference for the style of the circle around the user's location while following
+        followMarkerStyle: {},
+        circlePadding: [0, 0], // padding around accuracy circle, value is passed to setBounds
+        metric: true,  // use metric or imperial units
+        onLocationError: function(err) {alert(err.message)},  // define an error callback function
+        onLocationOutsideMapBounds:  function(context) { // called when outside map boundaries
+            alert(context.options.strings.outsideMapBoundsMsg);
+        },
+        strings: {
+            title: "Show me where I am",  // title of the locat control
+            popup: "You are within {distance} {unit} from this point",  // text to appear if user clicks on circle
+            outsideMapBoundsMsg: "You seem located outside the boundaries of the map" // default message for onLocationOutsideMapBounds
+        },
+        locateOptions: {}  // define location options e.g enableHighAccuracy: true
+    }).addTo(map);
+
+
+
+    new L.Control.GeoSearch({
+        provider: new L.GeoSearch.Provider.OpenStreetMap(),
+        position: 'topcenter',
+        showMarker: true
+    }).addTo(map);
 
 
 </script>
