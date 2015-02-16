@@ -69,6 +69,7 @@
 <script src='data/bus_routes.js'></script>
 <script src='data/bus_stops.js'></script>
 <script src='data/subzones.js'></script>
+<script src='data/subzones_centroid.js'></script>
 <!--Lets do the scripting-->
 <script>
     // Set the map
@@ -232,6 +233,40 @@
         subZonesGeoJson.addTo(map);
 
 
+    // The propotionate map
+
+    var propotionateMapBusStops  =
+            L.geoJson(busStopsData,{
+                pointToLayer: function(feature,latLng){
+                    return L.circleMarker(latLng, {
+                        radius: feature.properties.services/2,
+
+                        weight:2,
+                        fillColor:'#1f78b4',
+                        color: "white"// Border color
+                    });
+                }
+            });
+    propotionateMapBusStops.addTo(map);
+
+    var propotinateMapSubZone =
+            L.geoJson(subZonesCentroidData,{
+                pointToLayer: function(feature,latLng){
+                    return L.circleMarker(latLng,{
+                        radius: feature.properties.no_of_stop/5,
+                        weight : 3,
+                        fillColor:'#1f78b4',
+                        color: "white"// Border color
+                    });
+                }
+            });
+    propotinateMapSubZone.addTo(map);
+
+
+    // Additional propotionate map based on subregion
+
+    //var propotionateSubRegionTotalNumberOfBusStops =
+
     // Additional Plugins
 
     // domoritz/leaflet-locatecontrol
@@ -267,7 +302,9 @@
             {
                 'Bus Routes': busRoutesGeoJson,
                 'Bus Stops': markers,
-                'Chloropleth' : subZonesGeoJson
+                'Chloropleth Subzone Connectivity' : subZonesGeoJson,
+                'Bus stop Propotionate' : propotionateMapBusStops,
+                'Total No of Bust stops' : propotinateMapSubZone
             }, {collapsed: false, position: 'topleft'}).addTo(map);
 
 
