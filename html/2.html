@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Assignment 1</title>
+    <link rel="stylesheet" href="../leaflet/leaflet.css"/>
+    <link rel="stylesheet" href="../css/2.css"/>
+
+</head>
+
+<body>
+<div id="map"></div>
+<script src="../leaflet/leaflet.js"></script>
+<script>
+    var map = L.map('map');
+
+    // Create the tile layer
+    L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+        '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+        'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        id: 'examples.map-i875mjb7'
+    }).addTo(map);
+
+    // Lets locate user
+
+    map.locate({setView:true, maxZoom:18 });
+
+    map.on('locationfound', function(location){
+        var radius = location.accuracy/2;
+        L.marker(location.latlng).addTo(map);
+    });
+
+
+</script>
+
+</body>
+</html>
