@@ -68,6 +68,7 @@
 <!--Lets load all the data necessary TODO  can consider adding a spinner while the data is loading-->
 <script src='data/bus_routes.js'></script>
 <script src='data/bus_stops.js'></script>
+<script src='data/subzones.js'></script>
 <!--Lets do the scripting-->
 <script>
     // Set the map
@@ -178,6 +179,8 @@
     );
 
 
+    // TODO create the icon selector for the bus stop
+    //TODO The color could also be determined  by the no of bus services served
     var busStopsGeoJson =
     L.geoJson(busStopsData, {
         pointToLayer: function (feature, latlng) {
@@ -186,7 +189,6 @@
                     icon: "bus",
                     prefix: 'fa',
                     iconColor: 'white',
-
                     markerColor: 'red'
                 })
             });
@@ -210,6 +212,24 @@
     markers.addTo(map);
 
 
+    //NOW LETS DEAL WITH THE CHLOROPETH MAPS
+
+    // WE will use a single chloropleth with ablity to choose different attributes to determine the color
+    // TODO  make click to zoom to the area, make is dashed, allow to choose the attribute, allow the change the range
+    
+    var subZonesGeoJson = 
+            L.geoJson(subZonesData,{
+                style: function(feature){
+                    return {
+                        fillColor: feature.properties.color_qgis2leaf,
+                        color: '#000',
+                        weight: 1,
+                        opacity: feature.properties.transp_qgis2leaf,
+                        fillOpacity: feature.properties.transp_qgis2leaf
+                    };
+                }
+            });
+        subZonesGeoJson.addTo(map);
 
 
     // Additional Plugins
@@ -243,10 +263,11 @@
 
 
     // Add the layer controls
-    L.control.layers(baseMaps,
+        L.control.layers(baseMaps,
             {
                 'Bus Routes': busRoutesGeoJson,
-                'Bus Stops': markers
+                'Bus Stops': markers,
+                'Chloropleth' : subZonesGeoJson
             }, {collapsed: false, position: 'topleft'}).addTo(map);
 
 
