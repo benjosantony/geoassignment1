@@ -240,7 +240,6 @@
                 pointToLayer: function(feature,latLng){
                     return L.circleMarker(latLng, {
                         radius: feature.properties.services/2,
-
                         weight:2,
                         fillColor:'#1f78b4',
                         color: "white"// Border color
@@ -255,6 +254,8 @@
                     return L.circleMarker(latLng,{
                         radius: feature.properties.no_of_stop/5,
                         weight : 3,
+                        opacity: 1,
+                        fillOpacity :1,
                         fillColor:'#1f78b4',
                         color: "white"// Border color
                     });
@@ -313,6 +314,9 @@
         position: 'topcenter',
         showMarker: true
     }).addTo(map);
+
+
+//    Zoom to layer control
 
 
 </script>
