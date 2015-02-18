@@ -206,14 +206,14 @@ var markers = L.markerClusterGroup(
 );
 
 
-// TODO create the icon selector for the bus stop
 
+var selectedIcon = 'bus';
 var busStopsGeoJson =
     L.geoJson(busStopsData, {
         pointToLayer: function (feature, latlng) {
             return L.marker(latlng, {
                 icon: L.AwesomeMarkers.icon({
-                    icon: "bus",
+                    icon: selectedIcon,
                     prefix: 'fa',
                     iconColor: 'white',
                     markerColor: 'red'
@@ -237,6 +237,17 @@ var busStopsGeoJson =
 
 markers.addLayer(busStopsGeoJson);
 markers.addTo(map);
+
+$('#marker_selector').on('change',function(event){
+    event.stopPropagation();
+    var previousIcon = selectedIcon;
+    selectedIcon = this.value;
+    $('.fa').each(function (i, obj){
+        $(obj).addClass('fa-' + selectedIcon).removeClass('fa-' + previousIcon);
+    });
+});
+
+
 
 
 //NOW LETS DEAL WITH THE CHLOROPETH MAPS
@@ -387,7 +398,7 @@ new L.Control.GeoSearch({
 
 
 
-//Listeners
+//Listeners on the map
 
 //Listening to Overlay Layer Add
 map.on('overlayadd', function(a) {
@@ -398,6 +409,7 @@ map.on('overlayadd', function(a) {
 
     if(a.name == "Bus Stops"){
         $('#bus_stop_layer_controls').show();
+
     }
 
 });
