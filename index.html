@@ -35,14 +35,15 @@
 <div class="controlsContainer">
     <div class="controls">
         <h4>Chlorpleth Layer controls</h4>
+
         <div class="well">
             <label>Z field</label>
             <select id="z_field" class="form-control">
                 <option value="connectivity">Inter-Connectivity</option>
-                <option value="no_of_bus_routes" >Total No of bus routes</option>
-                <option value="no_of_stops" >Total No of Bus Stops</option>
-                <option value="route_len" >Bus Routes Total Length</option>
-                <option value="route_den" >Bus Route Density (Lenght/Area)</option>
+                <option value="no_of_bus_routes">Total No of bus routes</option>
+                <option value="no_of_stops">Total No of Bus Stops</option>
+                <option value="route_len">Bus Routes Total Length</option>
+                <option value="route_den">Bus Route Density (Lenght/Area)</option>
             </select>
             <br/>
             <label>Classification</label>
@@ -60,7 +61,7 @@
                 <option value="6">6</option>
                 <option value="7">7</option>
                 <option value="8">8</option>
-                <option value="9" >9</option>
+                <option value="9">9</option>
 
             </select>
             <br/>
@@ -68,7 +69,7 @@
             <br/>
             <label>Color Scheme</label>
             <select id="color_scheme" class="form-control">
-            <!--Data populated from js-->
+                <!--Data populated from js-->
             </select>
             <br/>
 
@@ -77,6 +78,7 @@
         </div>
 
         <h4>Bus stop Layer controls</h4>
+
         <div class="well">
             <label>Marker Selector</label>
             <select id="marker_selector" class="form-control">
@@ -87,10 +89,8 @@
         </div>
 
 
-
-
-
-    </div><!--End of controls-->
+    </div>
+    <!--End of controls-->
 
 
 </div>
@@ -133,7 +133,7 @@
 
 <script>
 
-    $(document).ready(function($) {
+    $(document).ready(function ($) {
         console.log(colorbrewer['Blues'][3][0]);
         console.log($('#z_field').val());
     });

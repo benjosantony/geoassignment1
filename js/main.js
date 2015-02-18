@@ -9,14 +9,14 @@ var chloroplethValidColorOptions = [
     'YlGnBu', 'GnBu'
 ];
 // Let populate the color selection stuff
-var $colorSelector  =  $('#color_scheme');
+var $colorSelector = $('#color_scheme');
 
 chloroplethValidColorOptions.forEach(function (colorName) {
-    $colorSelector.append('<option value="' + colorName+ '">' +colorName+'</option>');
+    $colorSelector.append('<option value="' + colorName + '">' + colorName + '</option>');
 });
 
 
-var chloroplethLegendSymbols = [1,2,3];// Dummy values to make the initial length 3
+var chloroplethLegendSymbols = [1, 2, 3];// Dummy values to make the initial length 3
 var chloroplethSelectedColor = chloroplethValidColorOptions[0];// Default
 var chloroplethValidVariables = ['connectivity', 'no_of_bus_routes', 'no_of_stops', 'route_len', 'route_den'];
 var chloroplethSelectedVariable = 'connectivity';// default
@@ -25,31 +25,26 @@ var chloroplethSelectedVariable = 'connectivity';// default
 function getColorForChloropleth(feature) {
 
     var props = feature.properties;
-    console.log(chloroplethSelectedColor);// Blues
-    console.log(colorbrewer[chloroplethSelectedColor]);//Object
-    console.log("Length of chloroplethLegendSymbols is " + chloroplethLegendSymbols.length);
-
-    console.log(colorbrewer[chloroplethSelectedColor][chloroplethLegendSymbols.length]);// Undefined
 
     var colors = colorbrewer[chloroplethSelectedColor][chloroplethLegendSymbols.length];
     var chloroplethVariableValue = props[chloroplethSelectedVariable];
 
     var index = 0;
-    var colorToReturn  = null;
+    var colorToReturn = null;
     for (index = 0; index < chloroplethLegendSymbols.length; index++) {
         var bounds = chloroplethLegendSymbols[index];
-        if (chloroplethVariableValue >= bounds.from && chloroplethVariableValue <= bounds.to){
+        if (chloroplethVariableValue >= bounds.from && chloroplethVariableValue <= bounds.to) {
             colorToReturn = colors[index];
             break;
         }
     }
-    colorToReturn = colorToReturn == null  ?  colors[(chloroplethLegendSymbols.length-1)] :  colorToReturn;
+    colorToReturn = colorToReturn == null ? colors[(chloroplethLegendSymbols.length - 1)] : colorToReturn;
 
     return colorToReturn;
 }
 
 
-$('#update_chloropleth_settings').on('click',function(event){
+$('#update_chloropleth_settings').on('click', function (event) {
     event.stopPropagation();
     // set the value of the selected color
     chloroplethSelectedColor = $('#color_scheme').val();
@@ -57,6 +52,7 @@ $('#update_chloropleth_settings').on('click',function(event){
 
 
     updateChloroplethSettings();
+    chloroplethLegend.update();
 });
 
 function updateChloroplethSettings() {
@@ -73,13 +69,42 @@ function updateChloroplethSettings() {
         geojson = geocolor.quantiles(subZonesData, zIndex, no_of_breaks, colorbrewer[chloroplethSelectedColor][no_of_breaks], {});
     } else { // Should be equal interval
         // No of breaks -1 because equal intervals always gives an extra interval, should be a bug in the plugin
-        geojson = geocolor.equalIntervals(subZonesData, zIndex, no_of_breaks -1, colorbrewer[chloroplethSelectedColor][no_of_breaks], {});
+        geojson = geocolor.equalIntervals(subZonesData, zIndex, no_of_breaks - 1, colorbrewer[chloroplethSelectedColor][no_of_breaks], {});
     }
     chloroplethLegendSymbols = geojson.legend.symbols;
     console.log(chloroplethLegendSymbols);
     // Now lets update the
     subZonesGeoJson.setStyle(chloroplethStyle);
 }
+
+
+function updateChloroplethLegend (){
+    // Empty the legends first
+    $('#legend').empty();
+    // Labels
+    var legend = '<h5>' + chloroplethSelectedVariable + '</h5>';
+    legend += '<div id="labels">';
+    chloroplethLegendSymbols.forEach(function (symbol) {
+        legend += '<div>' + parseFloat(symbol.from).toFixed(2) + ' - ' + parseFloat(symbol.to).toFixed(2) + '</div>';
+    });
+    legend += '</div>';
+
+    // Symbols
+    legend += '<div id="symbols">';
+    var colors = colorbrewer[chloroplethSelectedColor][chloroplethLegendSymbols.length];
+    var index  = 0;
+    for(index  =0 ; index < chloroplethLegendSymbols.length ; index++){
+        legend += '<div class="symbolBox" style="background-color:' + colors[index]+ '"></div>';
+    }
+
+    legend += '</div>';
+    $('#legend').append(legend);
+    $('#legend').show();
+
+}
+
+
+
 
 
 // Set the map
@@ -108,6 +133,8 @@ info.update = function (htmlContent) {
 };
 
 info.addTo(map);
+
+
 
 
 /**
@@ -157,8 +184,6 @@ busRoutesGeoJson = L.geoJson(busRouteData, {
     style: styleBusRoute,
     onEachFeature: onEachFeatureBusRoute
 });
-
-
 
 
 function styleBusRoute(feature) {
@@ -218,7 +243,7 @@ markers.addTo(map);
 // TODO  make click to zoom to the area, make is dashed, allow to choose the attribute, allow the change the range
 
 
-function chloroplethStyle (feature) {
+function chloroplethStyle(feature) {
     return {
         fillColor: getColorForChloropleth(feature),
         color: '#000',
@@ -227,8 +252,6 @@ function chloroplethStyle (feature) {
         fillOpacity: feature.properties.transp_qgis2leaf
     }
 }
-
-
 
 
 var subZonesGeoJson =
@@ -274,20 +297,17 @@ subZonesGeoJson.addTo(map);
 // Update settings
 updateChloroplethSettings();
 
-// The propotionate map
 
-//    var propotionateMapBusStops  =
-//            L.geoJson(busStopsData,{
-//                pointToLayer: function(feature,latLng){
-//                    return L.circleMarker(latLng, {
-//                        radius: feature.properties.services/2,
-//                        weight:2,
-//                        fillColor:'#1f78b4',
-//                        color: "white"// Border color
-//                    });
-//                }
-//            });
-//    propotionateMapBusStops.addTo(map);
+// Only add the legend after the first update of the chloro map
+var chloroplethLegend = L.control({position:'bottomright'});
+chloroplethLegend.onAdd = function(map){
+    this._div = L.DomUtil.create('div' );
+    this._div.id =  'legend';
+    return this._div;
+};
+chloroplethLegend.update = updateChloroplethLegend;
+chloroplethLegend.addTo(map);
+chloroplethLegend.update();
 
 var propotinateMapSubZone =
     L.geoJson(subZonesCentroidData, {
@@ -302,9 +322,6 @@ var propotinateMapSubZone =
             });
         }
     });
-
-
-
 
 
 // Additional propotionate map based on subregion
@@ -364,4 +381,3 @@ new L.Control.GeoSearch({
 }).addTo(map);
 
 
-//  TODO  Zoom to layer control
