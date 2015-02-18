@@ -52,15 +52,26 @@ html, body, #map {
     height: 20px;
 }
 
-#legend {
+.legend{
     border: 1px solid #eee;
-
     background-color: white;
     padding-bottom: 5px;
     padding-left: 5px;
     padding-right: 5px;
     bottom: 0;
 }
+
+#legend{
+    border: 1px solid #eee;
+    background-color: white;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    bottom: 0;
+}
+bottom: 0;
+
+
 #labels {
     float: left;
     padding-right: 15px;

@@ -1,14 +1,13 @@
-
 var propotinateMapSelectedColor = '#1f78b4';
 $(function () {
 
     $('#picker').colpick({
-        flat:true,
-        layout:'hex',
-        submit:0,
-        color:propotinateMapSelectedColor,
-        onChange: function(hsb,hex,rgb){
-            propotinateMapSelectedColor =  '#' + hex;
+        flat: true,
+        layout: 'hex',
+        submit: 0,
+        color: propotinateMapSelectedColor,
+        onChange: function (hsb, hex, rgb) {
+            propotinateMapSelectedColor = '#' + hex;
             propotinateMapSubZone.setStyle(propotionateStyle);
         }
     });
@@ -17,7 +16,6 @@ $(function () {
 });
 
 // Styling Variables
-
 
 
 // We are doing only sequential so only need the ones that have levels fromm 3 to 9
@@ -99,33 +97,31 @@ function updateChloroplethSettings() {
 }
 
 
-function updateChloroplethLegend (){
+function updateChloeoplethLegend() {
     // Empty the legends first
-    $('#legend').empty();
-    // Labels
-    var legend = '<h5>' + chloroplethSelectedVariable + '</h5>';
-    legend += '<div id="labels">';
+    var $legend = $('#legend').empty();
+    // Text
+    var legendContent =
+        '<h5>' + chloroplethSelectedVariable + '</h5>';
+    legendContent += '<div id="labels">';
     chloroplethLegendSymbols.forEach(function (symbol) {
-        legend += '<div>' + parseFloat(symbol.from).toFixed(2) + ' - ' + parseFloat(symbol.to).toFixed(2) + '</div>';
+        legendContent += '<div>' + parseFloat(symbol.from).toFixed(2) + ' - ' + parseFloat(symbol.to).toFixed(2) + '</div>';
     });
-    legend += '</div>';
+    legendContent += '</div>';
 
     // Symbols
-    legend += '<div id="symbols">';
+    legendContent += '<div id="symbols">';
     var colors = colorbrewer[chloroplethSelectedColor][chloroplethLegendSymbols.length];
-    var index  = 0;
-    for(index  =0 ; index < chloroplethLegendSymbols.length ; index++){
-        legend += '<div class="symbolBox" style="background-color:' + colors[index]+ '"></div>';
+    var index = 0;
+    for (index = 0; index < chloroplethLegendSymbols.length; index++) {
+        legendContent += '<div class="symbolBox" style="background-color:' + colors[index] + '"></div>';
     }
 
-    legend += '</div>';
-    $('#legend').append(legend);
-    $('#legend').show();
+    legendContent += '</div>';
+    $legend.append(legendContent);
+    $legend.show();
 
 }
-
-
-
 
 
 // Set the map
@@ -139,10 +135,10 @@ var osmBlackAndWhiteBaseMap = L.tileLayer('http://{s}.www.toolserver.org/tiles/b
 osmBlackAndWhiteBaseMap.addTo(map);
 osmStandardBaseMap.addTo(map);
 
-var zoomToSingapore  = L.control({position:'topleft'});
-zoomToSingapore.onAdd =  function(map){
-    this._div  = L.DomUtil.create('div');
-    this._div.innerHTML ='<img src="img/zoom.png" alt="Zoom to singapore" id="zoom_to_singapore"   title="Zoom back to Singapore " />';
+var zoomToSingapore = L.control({position: 'topleft'});
+zoomToSingapore.onAdd = function (map) {
+    this._div = L.DomUtil.create('div');
+    this._div.innerHTML = '<img src="img/zoom.png" alt="Zoom to singapore" id="zoom_to_singapore"   title="Zoom back to Singapore " />';
     return this._div;
 };
 
@@ -162,8 +158,6 @@ info.update = function (htmlContent) {
 };
 
 info.addTo(map);
-
-
 
 
 /**
@@ -233,7 +227,13 @@ var markers = L.markerClusterGroup(
 );
 
 
+function getBusStopColor(feature) {
+    if (feature.properties.services > 5)
+        return 'red'
+    else
+        return 'green';
 
+}
 var selectedIcon = 'bus';
 var busStopsGeoJson =
     L.geoJson(busStopsData, {
@@ -243,20 +243,27 @@ var busStopsGeoJson =
                     icon: selectedIcon,
                     prefix: 'fa',
                     iconColor: 'white',
-                    markerColor: 'red'
+                    markerColor: getBusStopColor(feature)
                 })
             });
         },
         onEachFeature: function (feature, layer) {
             var popupContent = '<table>' +
 
-                '<tr><th scope="row">Bus Stop Number</th><td>'
+                '<tr><th scope="row">Bus Stop Number </th><td>'
                 + feature.properties['BUS_STOP_N']
-                + '</td></tr><tr><th scope="row">Bus Roof Number</th><td>'
-                + feature.properties['BUS_ROOF_N']
-                + '</td></tr><tr><th scope="row">Location</th><td>'
+                + '</td></tr>' +
+                '<tr><th scope="row">Bus Roof Number </th>' +
+                '<td>' + feature.properties['BUS_ROOF_N']
+                + '</td>' +
+                '</tr>' +
+                '<tr><th scope="row">Location </th><td>'
                 + feature.properties['LOC_DESC']
                 + '</td></tr>' +
+                '<tr><th scope="row">Services </th>' +
+                '<td>' + feature.properties['services']
+                + '</td>' +
+                '</tr>' +
                 '</table>';
             layer.bindPopup(popupContent);
         }
@@ -265,16 +272,14 @@ var busStopsGeoJson =
 markers.addLayer(busStopsGeoJson);
 markers.addTo(map);
 
-$('#marker_selector').on('change',function(event){
+$('#marker_selector').on('change', function (event) {
     event.stopPropagation();
     var previousIcon = selectedIcon;
     selectedIcon = this.value;
-    $('.fa').each(function (i, obj){
+    $('.fa').each(function (i, obj) {
         $(obj).addClass('fa-' + selectedIcon).removeClass('fa-' + previousIcon);
     });
 });
-
-
 
 
 //NOW LETS DEAL WITH THE CHLOROPETH MAPS
@@ -338,16 +343,32 @@ subZonesGeoJson.addTo(map);
 updateChloroplethSettings();
 
 
-// Only add the legend after the first update of the chloro map
-var chloroplethLegend = L.control({position:'bottomright'});
-chloroplethLegend.onAdd = function(map){
-    this._div = L.DomUtil.create('div' );
-    this._div.id =  'legend';
+var busStopLegend = L.control({position: 'bottomright'});
+busStopLegend.onAdd = function (map) {
+    this._div = L.DomUtil.create('div');
+
+    this._div.innerHTML = '<div id="bus_stop_legend" class="legend" style="border: 1px solid #eee;  background-color: white;  padding-bottom: 5px;  padding-left: 5px;  padding-right: 5px;  " >' +
+
+    '<img src="img/green-marker.png" class="legend-marker">' +
+    '<span class="legend-text"> 0-5 Services </span>' +
+    '<img src="img/red-marker.png" class="legend-marker">' +
+    '<span class="legend-text"> >5 Routes</span>' +
+    '</div>';
     return this._div;
 };
-chloroplethLegend.update = updateChloroplethLegend;
+busStopLegend.addTo(map);
+
+// Only add the legend after the first update of the chloro map
+var chloroplethLegend = L.control({position: 'bottomright'});
+chloroplethLegend.onAdd = function (map) {
+    this._div = L.DomUtil.create('div');
+    this._div.id = 'legend';
+    return this._div;
+};
+chloroplethLegend.update = updateChloeoplethLegend;
 chloroplethLegend.addTo(map);
 chloroplethLegend.update();
+
 
 var propotinateMapSubZone =
     L.geoJson(subZonesCentroidData, {
@@ -365,8 +386,8 @@ var propotinateMapSubZone =
     });
 
 
-function propotionateStyle(feature){
-    return  {
+function propotionateStyle(feature) {
+    return {
         fillOpacity: 0.6,
         fillColor: propotinateMapSelectedColor
     }
@@ -429,24 +450,21 @@ new L.Control.GeoSearch({
 }).addTo(map);
 
 
-
-
-
-
 //Listeners on the map
 
 //Listening to Overlay Layer Add
-map.on('overlayadd', function(a) {
-    if(a.name == "Chloropleth") {
+map.on('overlayadd', function (a) {
+    if (a.name == "Chloropleth") {
         $('#legend').show();
         $('#chloropleth_controls').show();
     }
 
-    if(a.name == "Bus Stops"){
+    if (a.name == "Bus Stops") {
         $('#bus_stop_layer_controls').show();
+        $('#bus_stop_legend').show();
 
     }
-    if(a.name == "Total No of Bus stops"){
+    if (a.name == "Total No of Bus stops") {
         $('#propotional_layer_controls').show();
 
     }
@@ -454,18 +472,18 @@ map.on('overlayadd', function(a) {
 });
 
 
-
 //Listening to Overlay Layer Remove
-map.on('overlayremove', function(a) {
+map.on('overlayremove', function (a) {
     console.log(a);
-    if(a.name == "Chloropleth") {
+    if (a.name == "Chloropleth") {
         $('#legend').hide();
         $('#chloropleth_controls').hide();
     }
-    if(a.name == "Bus Stops"){
+    if (a.name == "Bus Stops") {
         $('#bus_stop_layer_controls').hide();
+        $('#bus_stop_legend').hide();
     }
-    if(a.name == "Total No of Bus stops"){
+    if (a.name == "Total No of Bus stops") {
         $('#propotional_layer_controls').hide();
 
     }
