@@ -284,7 +284,10 @@ $('#marker_selector').on('change', function (event) {
     var previousIcon = selectedIcon;
     selectedIcon = this.value;
     $('.fa').each(function (i, obj) {
-        $(obj).addClass('fa-' + selectedIcon).removeClass('fa-' + previousIcon);
+        if($(obj).hasClass('fa-' +previousIcon)){
+            $(obj).addClass('fa-' + selectedIcon).removeClass('fa-' + previousIcon);
+        }
+
     });
 });
 
