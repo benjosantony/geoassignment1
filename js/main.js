@@ -381,3 +381,22 @@ new L.Control.GeoSearch({
 }).addTo(map);
 
 
+
+//Listeners
+
+//Listening to Overlay Layer Add
+map.on('overlayadd', function(a) {
+    if(a.name == "Chloropleth") {
+        $('#legend').show();
+    }
+
+});
+
+//Listening to Overlay Layer Remove
+map.on('overlayremove', function(a) {
+    console.log(a);
+    if(a.name == "Chloropleth") {
+        $('#legend').hide();
+    }
+   
+});
