@@ -248,24 +248,31 @@ var busStopsGeoJson =
             });
         },
         onEachFeature: function (feature, layer) {
-            var popupContent = '<table>' +
 
-                '<tr><th scope="row">Bus Stop Number </th><td>'
-                + feature.properties['BUS_STOP_N']
-                + '</td></tr>' +
-                '<tr><th scope="row">Bus Roof Number </th>' +
-                '<td>' + feature.properties['BUS_ROOF_N']
-                + '</td>' +
-                '</tr>' +
-                '<tr><th scope="row">Location </th><td>'
-                + feature.properties['LOC_DESC']
-                + '</td></tr>' +
-                '<tr><th scope="row">Services </th>' +
-                '<td>' + feature.properties['services']
-                + '</td>' +
-                '</tr>' +
-                '</table>';
-            layer.bindPopup(popupContent);
+
+            var content = '<div >';
+            content += '<table  class="table table-striped">';
+
+            content += '<tr>';
+            content += '<td><b>' + 'Bus Stop Number' + '</b></td><td>' + feature.properties['BUS_STOP_N'] + '</td>';
+            content += '</tr>';
+
+            content += '<tr>';
+            content += '<td><b>' + 'Bus Roof Number' + '</b></td><td>' + feature.properties['BUS_ROOF_N'] + '</td>';
+            content += '</tr>';
+
+            content += '<tr>';
+            content += '<td><b>' + 'Location' + '</b></td><td>' + feature.properties['LOC_DESC'] + '</td>';
+            content += '</tr>';
+
+            content += '<tr>';
+            content += '<td><b>' + 'Services' + '</b></td><td>' + feature.properties['services'] + '</td>';
+            content += '</tr>';
+
+            content += '</table>';
+            content += '</div>';
+
+            layer.bindPopup(content);
         }
     });
 
@@ -497,3 +504,37 @@ $('#zoom_to_singapore').on('click', function (event) {
     map.fitBounds(subZonesGeoJson.getBounds());
     map.setView([1.355312, 103.840068], 11);
 });
+
+
+// Add  new geojson layer
+var upLoadedFileFields;
+// Upload File
+$('#dropFile').on('change', function (evt) {
+    var reader = new FileReader();
+    reader.readAsText(evt.currentTarget.files[0]);
+    reader.onload = function (e) {
+
+        var geojson = JSON.parse(e.target.result);
+        upLoadedFileFields = Object.keys(geojson.features[0].properties);
+        console.log(upLoadedFileFields);
+        var uploadDataGeoJsonLayer = L.geoJson(geojson, {onEachFeature: setPopups});
+        uploadDataGeoJsonLayer.addTo(map);
+        map.fitBounds(uploadDataGeoJsonLayer.getBounds());
+
+    }
+});
+
+function setPopups(feature, layer) {
+    var content = '<div >';
+    content += '<table  class="table table-striped">';
+    upLoadedFileFields.forEach(function (field) {
+        content += '<tr>';
+        content += '<td><b>' + field + '</b></td><td>' + feature.properties[field] + '</td>';
+        content += '</tr>';
+
+    });
+    content += '</table>';
+    content += '</div>';
+
+    layer.bindPopup(content);
+}
