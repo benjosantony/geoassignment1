@@ -359,7 +359,7 @@ busStopLegend.onAdd = function (map) {
     '<img src="img/green-marker.png" class="legend-marker">' +
     '<span class="legend-text"> 0-5 Services </span>' +
     '<img src="img/red-marker.png" class="legend-marker">' +
-    '<span class="legend-text"> >5 Routes</span>' +
+    '<span class="legend-text"> >5 Services</span>' +
     '</div>';
     return this._div;
 };
