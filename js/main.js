@@ -1,29 +1,100 @@
-/**
- * Created by Ben on 18/2/15.
- */
+// Styling Variables
+// We are doing only sequential so only need the ones that have levels fromm 3 to 9
+var chloroplethValidColorOptions = [
+    'Blues', 'Oranges', 'Reds', 'Greys',
+    'BuGn', 'PuBuGn', 'PuBu',
+    'BuPu', 'RdPu', 'PuRd',
+    'OrRd', 'YlOrRd', 'YlOrBr',
+    'Purples', 'YlGn', 'Greens',
+    'YlGnBu', 'GnBu'
+];
+// Let populate the color selection stuff
+var $colorSelector  =  $('#color_scheme');
+
+chloroplethValidColorOptions.forEach(function (colorName) {
+    $colorSelector.append('<option value="' + colorName+ '">' +colorName+'</option>');
+});
+
+
+var chloroplethLegendSymbols = [1,2,3];// Dummy values to make the initial length 3
+var chloroplethSelectedColor = chloroplethValidColorOptions[0];// Default
+var chloroplethValidVariables = ['connectivity', 'no_of_bus_routes', 'no_of_stops', 'route_len', 'route_den'];
+var chloroplethSelectedVariable = 'connectivity';// default
+
+
+function getColorForChloropleth(feature) {
+
+    var props = feature.properties;
+    console.log(chloroplethSelectedColor);// Blues
+    console.log(colorbrewer[chloroplethSelectedColor]);//Object
+    console.log("Length of chloroplethLegendSymbols is " + chloroplethLegendSymbols.length);
+
+    console.log(colorbrewer[chloroplethSelectedColor][chloroplethLegendSymbols.length]);// Undefined
+
+    var colors = colorbrewer[chloroplethSelectedColor][chloroplethLegendSymbols.length];
+    var chloroplethVariableValue = props[chloroplethSelectedVariable];
+
+    var index = 0;
+    var colorToReturn  = null;
+    for (index = 0; index < chloroplethLegendSymbols.length; index++) {
+        var bounds = chloroplethLegendSymbols[index];
+        if (chloroplethVariableValue >= bounds.from && chloroplethVariableValue <= bounds.to){
+            colorToReturn = colors[index];
+            break;
+        }
+    }
+    colorToReturn = colorToReturn == null  ?  colors[(chloroplethLegendSymbols.length-1)] :  colorToReturn;
+
+    return colorToReturn;
+}
+
+
+$('#update_chloropleth_settings').on('click',function(event){
+    event.stopPropagation();
+    // set the value of the selected color
+    chloroplethSelectedColor = $('#color_scheme').val();
+    chloroplethSelectedVariable = $('#z_field').val();
+
+
+    updateChloroplethSettings();
+});
+
+function updateChloroplethSettings() {
+    // The is the chloropleth variable, zIndex is just another name
+    var zIndex = $('#z_field').val();
+    var classification = $('#classification').val();
+    var no_of_breaks = $('#no_of_breaks').val();
+
+    // Just to make sure it does not go above 9
+    var geojson;
+    if (classification == 'Jenks') {
+        geojson = geocolor.jenks(subZonesData, zIndex, no_of_breaks, colorbrewer[chloroplethSelectedColor][no_of_breaks], {});
+    } else if (classification == 'Quantiles') {
+        geojson = geocolor.quantiles(subZonesData, zIndex, no_of_breaks, colorbrewer[chloroplethSelectedColor][no_of_breaks], {});
+    } else { // Should be equal interval
+        // No of breaks -1 because equal intervals always gives an extra interval, should be a bug in the plugin
+        geojson = geocolor.equalIntervals(subZonesData, zIndex, no_of_breaks -1, colorbrewer[chloroplethSelectedColor][no_of_breaks], {});
+    }
+    chloroplethLegendSymbols = geojson.legend.symbols;
+    console.log(chloroplethLegendSymbols);
+    // Now lets update the
+    subZonesGeoJson.setStyle(chloroplethStyle);
+}
+
 
 // Set the map
-
-//var map = L.map('map', { zoomControl:true }).fitBounds([[1.0767513637,103.591111131],[1.57579761917,104.103108808]]);
 var map = L.map('map', {zoomControl: true, zoomSliderControl: true}).setView([1.355312, 103.840068], 12);
-// group for the  vectors
-var feature_group = new L.featureGroup([]);
 
+// Base layers
 var osmStandardBaseMap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
 var osmBlackAndWhiteBaseMap = L.tileLayer('http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png');
 
 // Add the base layers to the map
-
 osmBlackAndWhiteBaseMap.addTo(map);
 osmStandardBaseMap.addTo(map);
-// baseMaps key value pair to be added in the layer group
-var baseMaps = {
 
-    'OSM Black & White': osmBlackAndWhiteBaseMap,
-    'OSM Standard': osmStandardBaseMap
-};
 
-// General Information container control
+// Chloropleth information container
 var info = L.control({position: 'topright'});
 info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info');
@@ -38,8 +109,6 @@ info.update = function (htmlContent) {
 
 info.addTo(map);
 
-
-// Lets deal with the basic layers first
 
 /**
  * Reset the highlight the feature of  busroute
@@ -111,7 +180,7 @@ var markers = L.markerClusterGroup(
 
 
 // TODO create the icon selector for the bus stop
-//TODO The color could also be determined  by the no of bus services served
+
 var busStopsGeoJson =
     L.geoJson(busStopsData, {
         pointToLayer: function (feature, latlng) {
@@ -148,20 +217,62 @@ markers.addTo(map);
 // WE will use a single chloropleth with ablity to choose different attributes to determine the color
 // TODO  make click to zoom to the area, make is dashed, allow to choose the attribute, allow the change the range
 
+
+function chloroplethStyle (feature) {
+    return {
+        fillColor: getColorForChloropleth(feature),
+        color: '#000',
+        weight: 1,
+        opacity: feature.properties.transp_qgis2leaf,
+        fillOpacity: feature.properties.transp_qgis2leaf
+    }
+}
+
+
+
+
 var subZonesGeoJson =
     L.geoJson(subZonesData, {
-        style: function (feature) {
-            return {
-                fillColor: feature.properties.color_qgis2leaf,
-                color: '#000',
-                weight: 1,
-                opacity: feature.properties.transp_qgis2leaf,
-                fillOpacity: feature.properties.transp_qgis2leaf
-            };
+        style: chloroplethStyle,
+        onEachFeature: function (feature, layer) {
+            layer.on({
+                mouseover: showSubzoneInfoInInfoPanel,
+                mouseout: resetSubzoneStyle,
+                click: zoomToFeature
+            });
         }
     });
-subZonesGeoJson.addTo(map);
 
+
+function resetSubzoneStyle(e) {
+    subZonesGeoJson.resetStyle(e.target);
+    info.update();
+}
+
+function showSubzoneInfoInInfoPanel(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        color: 'white',
+        dashArray: 2,
+        weight: 2
+    });
+
+    var feature = layer.feature;
+    var props = feature.properties;
+    var htmlContent = '<h4> District Information </h4>' +
+        '<b>' + props.subzone_n + '</b><br/><br/>' +
+        'Inter Connectivity: ' + props.connectivity + ' <br/>' + ' <br/>' +
+        'But Route Density:  ' + props.route_den + ' m/m<sup>2</sup><br/>' + ' <br/>' +
+        'But routes total length:  ' + props.route_len + ' m <br/>' + ' <br/>' +
+        'No of bus routes :  ' + props.no_of_bus_routes + ' <br/>' + ' <br/>' +
+        'No of Bus stops:  ' + props.no_of_stops + ' <br/>';
+    info.update(htmlContent);
+}
+
+subZonesGeoJson.addTo(map);
+// Update settings
+updateChloroplethSettings();
 
 // The propotionate map
 
@@ -191,6 +302,8 @@ var propotinateMapSubZone =
             });
         }
     });
+
+
 propotinateMapSubZone.addTo(map);
 
 
@@ -228,17 +341,22 @@ L.control.locate({
 }).addTo(map);
 
 
+// baseMaps key value pair to be added in the layer group
+var baseMaps = {
+
+    'OSM Black & White': osmBlackAndWhiteBaseMap,
+    'OSM Standard': osmStandardBaseMap
+};
 // Add the layer controls
 L.control.layers(baseMaps,
     {
         'Bus Routes': busRoutesGeoJson,
         'Bus Stops': markers,
-        'Chloropleth Subzone Connectivity': subZonesGeoJson,
-        //'Bus stop Propotionate' : propotionateMapBusStops,
+        'Chloropleth': subZonesGeoJson,
         'Total No of Bust stops': propotinateMapSubZone
-    }, {collapsed: false, position: 'topleft'}).addTo(map);
+    }, {collapsed: true, position: 'topleft'}).addTo(map);
 
-
+L.control.scale({maxWidth: 200}).addTo(map);
 new L.Control.GeoSearch({
     provider: new L.GeoSearch.Provider.OpenStreetMap(),
     position: 'topcenter',

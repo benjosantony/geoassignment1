@@ -38,33 +38,42 @@
         <div class="well">
             <label>Z field</label>
             <select id="z_field" class="form-control">
-                <option>Inter-Connectivity</option>
-                <option>Bus Route Density</option>
-                <option>Routes Length</option>
-                <option>Total No of Bus stops</option>
+                <option value="connectivity">Inter-Connectivity</option>
+                <option value="no_of_bus_routes" >Total No of bus routes</option>
+                <option value="no_of_stops" >Total No of Bus Stops</option>
+                <option value="route_len" >Bus Routes Total Length</option>
+                <option value="route_den" >Bus Route Density (Lenght/Area)</option>
             </select>
             <br/>
             <label>Classification</label>
             <select id="classification" class="form-control">
-                <option>Jenks</option>
-                <option>Quantiles</option>
-                <option>Equal Interval</option>
+                <option value="Jenks">Jenks</option>
+                <option value="Quantiles">Quantiles</option>
+                <option value="EqualInterval">Equal Interval</option>
             </select>
             <br/>
             <label>No of Breaks</label>
             <select id="no_of_breaks" class="form-control">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-                <option>5</option>
-                <option>6</option>
-                <option>7</option>
-                <option>8</option>
-                <option>9</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9" >9</option>
+
             </select>
             <br/>
-            <button class="btn btn-success">Submit</button>
+
+            <br/>
+            <label>Color Scheme</label>
+            <select id="color_scheme" class="form-control">
+            <!--Data populated from js-->
+            </select>
+            <br/>
+
+
+            <button class="btn btn-success" id="update_chloropleth_settings">Change</button>
         </div>
 
         <h4>Bus stop Layer controls</h4>
@@ -108,7 +117,10 @@
 <script src="plugins/marker_cluster/leaflet.markercluster.js"></script>
 <!--Zoom Slider-->
 <script src="plugins/zoom_slider/L.Control.Zoomslider.js"></script>
-
+<!--Color brewer-->
+<script src="plugins/colorbrewer/colorbrewer.js"></script>
+<!--Geo Color -->
+<script src="plugins/geocolor/geocolor.min.js"></script>
 
 <!--Lets load all the data necessary TODO  can consider adding a spinner while the data is loading-->
 <script src='data/bus_routes.js'></script>
@@ -121,6 +133,10 @@
 
 <script>
 
+    $(document).ready(function($) {
+        console.log(colorbrewer['Blues'][3][0]);
+        console.log($('#z_field').val());
+    });
 
 
 </script>
