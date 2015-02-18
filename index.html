@@ -27,13 +27,16 @@
     <!--Zoom slider-->
     <link rel="stylesheet" href="plugins/zoom_slider/L.Control.Zoomslider.css"/>
 
+    <!--Color Pick-->
+    <link rel="stylesheet" href="plugins/colorpick/css/colpick.css" type="text/css"/>
 
 </head>
 
 <body>
 <div id="map"></div>
-<div class="controlsContainer" >
+<div class="controlsContainer">
     <div class="controls">
+
         <div id="chloropleth_controls">
             <h4>Chlorpleth Layer controls</h4>
 
@@ -67,7 +70,7 @@
                 </select>
                 <br/>
 
-                <br/>
+
                 <label>Color Scheme</label>
                 <select id="color_scheme" class="form-control">
                     <!--Data populated from js-->
@@ -80,7 +83,7 @@
         </div>
 
 
-        <div id="bus_stop_layer_controls" >
+        <div id="bus_stop_layer_controls">
             <h4>Bus stop Layer controls</h4>
 
             <div class="well">
@@ -93,7 +96,14 @@
             </div>
         </div>
 
+        <div id="propotional_layer_controls" hidden="hidden">
+            <h4>Propotional map controls</h4>
+            <div class="well">
+                <label>Color of the propotionate symbol map </label>
+                <div id="picker"></div>
+            </div>
 
+        </div>
 
 
     </div>
@@ -129,12 +139,16 @@
 <!--Geo Color -->
 <script src="plugins/geocolor/geocolor.min.js"></script>
 
+
+
+<!--Color Pick-->
+<script src="plugins/colorpick/js/colpick.js" type="text/javascript"></script>
+
 <!--Lets load all the data necessary TODO  can consider adding a spinner while the data is loading-->
 <script src='data/bus_routes.js'></script>
 <script src='data/bus_stops.js'></script>
 <script src='data/subzones.js'></script>
 <script src='data/subzones_centroid.js'></script>
-
 
 
 <script>

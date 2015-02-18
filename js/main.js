@@ -1,6 +1,25 @@
 
+var propotinateMapSelectedColor = '#1f78b4';
+$(function () {
+
+    $('#picker').colpick({
+        flat:true,
+        layout:'hex',
+        submit:0,
+        color:propotinateMapSelectedColor,
+        onChange: function(hsb,hex,rgb){
+            propotinateMapSelectedColor =  '#' + hex;
+            propotinateMapSubZone.setStyle(propotionateStyle);
+        }
+    });
+
+
+});
 
 // Styling Variables
+
+
+
 // We are doing only sequential so only need the ones that have levels fromm 3 to 9
 var chloroplethValidColorOptions = [
     'Blues', 'Oranges', 'Reds', 'Greys',
@@ -327,15 +346,23 @@ var propotinateMapSubZone =
         pointToLayer: function (feature, latLng) {
             return L.circleMarker(latLng, {
                 radius: feature.properties.no_of_stop / 5,
-                weight: 3,
+                weight: 1,
                 opacity: 0.6,
                 fillOpacity: 0.6,
-                fillColor: '#1f78b4',
+                fillColor: propotinateMapSelectedColor,
                 color: "white"// Border color
             });
-        }
+        },
+        style: propotionateStyle
     });
 
+
+function propotionateStyle(feature){
+    return  {
+        fillOpacity: 0.6,
+        fillColor: propotinateMapSelectedColor
+    }
+}
 
 // Additional propotionate map based on subregion
 
@@ -383,7 +410,7 @@ L.control.layers(baseMaps,
         'Bus Routes': busRoutesGeoJson,
         'Bus Stops': markers,
         'Chloropleth': subZonesGeoJson,
-        'Total No of Bust stops': propotinateMapSubZone
+        'Total No of Bus stops': propotinateMapSubZone
     }, {collapsed: true, position: 'topleft'}).addTo(map);
 
 L.control.scale({maxWidth: 200}).addTo(map);
@@ -411,6 +438,10 @@ map.on('overlayadd', function(a) {
         $('#bus_stop_layer_controls').show();
 
     }
+    if(a.name == "Total No of Bus stops"){
+        $('#propotional_layer_controls').show();
+
+    }
 
 });
 
@@ -426,6 +457,9 @@ map.on('overlayremove', function(a) {
     if(a.name == "Bus Stops"){
         $('#bus_stop_layer_controls').hide();
     }
+    if(a.name == "Total No of Bus stops"){
+        $('#propotional_layer_controls').hide();
 
+    }
 
 });
