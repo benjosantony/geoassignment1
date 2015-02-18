@@ -5,3 +5,42 @@ body {
 html, body, #map {
     height: 100%;
 }
+
+#map {
+    float: left;
+    width: 80%;
+    border: 1px solid #eee;
+}
+
+.controlsContainer{
+    overflow-y: scroll;
+    height: 100%;
+    width: 19%;
+    float: right;
+
+}
+
+.controls{
+    padding: 10px 10px  2px 2px;
+    color: #938A8A;
+}
+
+
+.controls h3  {
+    color: #766F6F;
+}
+
+
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
