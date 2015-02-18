@@ -159,7 +159,7 @@ busRoutesGeoJson = L.geoJson(busRouteData, {
 });
 
 
-busRoutesGeoJson.addTo(map);
+
 
 function styleBusRoute(feature) {
     return {
@@ -295,8 +295,8 @@ var propotinateMapSubZone =
             return L.circleMarker(latLng, {
                 radius: feature.properties.no_of_stop / 5,
                 weight: 3,
-                opacity: 1,
-                fillOpacity: 1,
+                opacity: 0.6,
+                fillOpacity: 0.6,
                 fillColor: '#1f78b4',
                 color: "white"// Border color
             });
@@ -304,7 +304,7 @@ var propotinateMapSubZone =
     });
 
 
-propotinateMapSubZone.addTo(map);
+
 
 
 // Additional propotionate map based on subregion
