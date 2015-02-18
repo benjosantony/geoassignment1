@@ -129,7 +129,7 @@ function updateChloroplethLegend (){
 
 
 // Set the map
-var map = L.map('map', {zoomControl: true, zoomSliderControl: true}).setView([1.355312, 103.840068], 12);
+var map = L.map('map', {zoomControl: true, zoomSliderControl: true}).setView([1.355312, 103.840068], 11);
 
 // Base layers
 var osmStandardBaseMap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
@@ -139,6 +139,14 @@ var osmBlackAndWhiteBaseMap = L.tileLayer('http://{s}.www.toolserver.org/tiles/b
 osmBlackAndWhiteBaseMap.addTo(map);
 osmStandardBaseMap.addTo(map);
 
+var zoomToSingapore  = L.control({position:'topleft'});
+zoomToSingapore.onAdd =  function(map){
+    this._div  = L.DomUtil.create('div');
+    this._div.innerHTML ='<img src="img/zoom.png" alt="Zoom to singapore" id="zoom_to_singapore"   title="Zoom back to Singapore " />';
+    return this._div;
+};
+
+zoomToSingapore.addTo(map);
 
 // Chloropleth information container
 var info = L.control({position: 'topright'});
@@ -462,4 +470,12 @@ map.on('overlayremove', function(a) {
 
     }
 
+});
+
+
+// Additional fun stuff
+
+$('#zoom_to_singapore').on('click', function (event) {
+    map.fitBounds(subZonesGeoJson.getBounds());
+    map.setView([1.355312, 103.840068], 11);
 });
