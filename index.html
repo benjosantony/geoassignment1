@@ -32,61 +32,68 @@
 
 <body>
 <div id="map"></div>
-<div class="controlsContainer">
+<div class="controlsContainer" >
     <div class="controls">
-        <h4>Chlorpleth Layer controls</h4>
+        <div id="chloropleth_controls">
+            <h4>Chlorpleth Layer controls</h4>
 
-        <div class="well">
-            <label>Z field</label>
-            <select id="z_field" class="form-control">
-                <option value="connectivity">Inter-Connectivity</option>
-                <option value="no_of_bus_routes">Total No of bus routes</option>
-                <option value="no_of_stops">Total No of Bus Stops</option>
-                <option value="route_len">Bus Routes Total Length</option>
-                <option value="route_den">Bus Route Density (Lenght/Area)</option>
-            </select>
-            <br/>
-            <label>Classification</label>
-            <select id="classification" class="form-control">
-                <option value="Jenks">Jenks</option>
-                <option value="Quantiles">Quantiles</option>
-                <option value="EqualInterval">Equal Interval</option>
-            </select>
-            <br/>
-            <label>No of Breaks</label>
-            <select id="no_of_breaks" class="form-control">
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
+            <div class="well">
+                <label>Z field</label>
+                <select id="z_field" class="form-control">
+                    <option value="connectivity">Inter-Connectivity</option>
+                    <option value="no_of_bus_routes">Total No of bus routes</option>
+                    <option value="no_of_stops">Total No of Bus Stops</option>
+                    <option value="route_len">Bus Routes Total Length</option>
+                    <option value="route_den">Bus Route Density (Lenght/Area)</option>
+                </select>
+                <br/>
+                <label>Classification</label>
+                <select id="classification" class="form-control">
+                    <option value="Jenks">Jenks</option>
+                    <option value="Quantiles">Quantiles</option>
+                    <option value="EqualInterval">Equal Interval</option>
+                </select>
+                <br/>
+                <label>No of Breaks</label>
+                <select id="no_of_breaks" class="form-control">
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
 
-            </select>
-            <br/>
+                </select>
+                <br/>
 
-            <br/>
-            <label>Color Scheme</label>
-            <select id="color_scheme" class="form-control">
-                <!--Data populated from js-->
-            </select>
-            <br/>
+                <br/>
+                <label>Color Scheme</label>
+                <select id="color_scheme" class="form-control">
+                    <!--Data populated from js-->
+                </select>
+                <br/>
 
 
-            <button class="btn btn-success" id="update_chloropleth_settings">Change</button>
+                <button class="btn btn-success" id="update_chloropleth_settings">Change</button>
+            </div>
         </div>
 
-        <h4>Bus stop Layer controls</h4>
 
-        <div class="well">
-            <label>Marker Selector</label>
-            <select id="marker_selector" class="form-control">
-                <option>Bus</option>
-                <option>Star</option>
-                <option>Location</option>
-            </select>
+        <div id="bus_stop_layer_controls" >
+            <h4>Bus stop Layer controls</h4>
+
+            <div class="well">
+                <label>Marker Selector</label>
+                <select id="marker_selector" class="form-control">
+                    <option>Bus</option>
+                    <option>Star</option>
+                    <option>Location</option>
+                </select>
+            </div>
         </div>
+
+
 
 
     </div>
@@ -128,18 +135,17 @@
 <script src='data/subzones.js'></script>
 <script src='data/subzones_centroid.js'></script>
 
-<!--Lets do the scripting-->
-<script src='js/main.js'></script>
+
 
 <script>
 
-    $(document).ready(function ($) {
-        console.log(colorbrewer['Blues'][3][0]);
-        console.log($('#z_field').val());
-    });
+
 
 
 </script>
+
+<!--Lets do the scripting-->
+<script src='js/main.js'></script>
 
 </body>
 </html>

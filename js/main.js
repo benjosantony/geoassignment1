@@ -1,3 +1,5 @@
+
+
 // Styling Variables
 // We are doing only sequential so only need the ones that have levels fromm 3 to 9
 var chloroplethValidColorOptions = [
@@ -382,21 +384,36 @@ new L.Control.GeoSearch({
 
 
 
+
+
+
 //Listeners
 
 //Listening to Overlay Layer Add
 map.on('overlayadd', function(a) {
     if(a.name == "Chloropleth") {
         $('#legend').show();
+        $('#chloropleth_controls').show();
+    }
+
+    if(a.name == "Bus Stops"){
+        $('#bus_stop_layer_controls').show();
     }
 
 });
+
+
 
 //Listening to Overlay Layer Remove
 map.on('overlayremove', function(a) {
     console.log(a);
     if(a.name == "Chloropleth") {
         $('#legend').hide();
+        $('#chloropleth_controls').hide();
     }
-   
+    if(a.name == "Bus Stops"){
+        $('#bus_stop_layer_controls').hide();
+    }
+
+
 });
